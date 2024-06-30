@@ -11,8 +11,10 @@ const CodeEditor = () => {
   const [language, setLanguage] = useState("javascript");
 
   const onMount = (editor) => {
+    console.log(editor)
     editorRef.current = editor;
     editor.focus();
+   
   };
 
   const onSelect = (language) => {

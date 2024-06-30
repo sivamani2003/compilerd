@@ -5,6 +5,7 @@ export const LANGUAGE_VERSIONS = {
     java: "15.0.2",
     csharp: "6.12.0",
     php: "8.2.3",
+    nodejs:"16.13.0",
   };
   
   export const CODE_SNIPPETS = {
