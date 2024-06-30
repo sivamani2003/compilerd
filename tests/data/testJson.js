@@ -142,6 +142,24 @@ const testCases = [
         },
     },
     {
+        name:'bash:print stdin',
+        reqObject:{
+            language:'bash',
+            script:
+                ' echo "Enter a number"\n'+
+                'read num \n'+
+                'fact=1\n'+
+                'while [ $num -gt 1 ]\n'+
+                'do\n'+
+                'fact=$((fact * num)) \n'+
+                'num=$((num - 1))  \n'+
+                'done\n'+
+                'echo $fact\n',
+            stdin:'5'
+        },
+        
+    },
+    {
         name: 'java : print stdin',
         reqObject: {
             language: 'java',
