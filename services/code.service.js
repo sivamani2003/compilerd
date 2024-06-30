@@ -192,69 +192,71 @@ const _executePrompt = async (
 }
 
 const _executeCode = async (req, res, response) => {
-    let args = null
-    let code = null
-    let hasInputFiles = false
-    let language = null
-    let stdin = null
-
+    let args = null;
+    let code = null;
+    let hasInputFiles = false;
+    let language = null;
+    let stdin = null;
+  
     try {
-        // Parse Input
-        // eslint-disable-next-line no-unused-vars
-        args = req.args
-        // eslint-disable-next-line no-unused-vars
-        hasInputFiles = req.hasInputFiles
-
-        code = req.script
-        language = req.language
-        stdin = req.stdin
-        const langConfig = LANGUAGES_CONFIG[language]
-        // Remove all files from tmp folder
-        await _runScript('rm -rf /tmp/*', res)
-
-        // Write file in tmp folder based on language
-        await fs.promises.writeFile(`/tmp/${langConfig.filename}`, code)
-
-        const compileCommand = `cd /tmp/ && ${langConfig.compile}`
-        // Run compile command
-        const compileLog = await _runScript(compileCommand, res, true)
+     
+      args = req.args;
+      hasInputFiles = req.hasInputFiles;
+  
+      code = req.script;
+      language = req.language;
+      stdin = req.stdin;
+      const langConfig = LANGUAGES_CONFIG[language];
+      await _runScript("rm -rf /tmp/*", res);
+  
+      if (!langConfig) {
+        throw new Error(`Unsupported language: ${language}`);
+      }
+  
+      await fs.promises.writeFile(`/tmp/${langConfig.filename}`, code);
+  
+      let compileCommand = "";
+      if (langConfig.compile) {
+        compileCommand = `cd /tmp/ && ${langConfig.compile}`;
+        const compileLog = await _runScript(compileCommand, res, true);
         response.compileMessage =
-            compileLog.error !== undefined ? _prepareErrorMessage(compileLog, language, compileCommand) : ''
-
-        // Check if there is no compilation error
-        if (response.compileMessage === '') {
-            let command
-            if (language === 'java') {
-                // Remove ulimit as a temp fix
-                command = `cd /tmp/ && timeout ${langConfig.timeout}s ${langConfig.run}`
-            } else {
-                command = `cd /tmp/ && ulimit -v ${langConfig.memory} && ulimit -m ${langConfig.memory} && timeout ${langConfig.timeout}s ${langConfig.run}`
-            }
-
-            // Check if there is any input that is to be provided to code execution
-            if (stdin) {
-                // Write input in a file in tmp folder
-                await fs.promises.writeFile('/tmp/input.txt', stdin)
-                // Update the execution command
-                command += ' < input.txt'
-            }
-
-            const outputLog = await _runScript(command, res, true)
-            response.output =
-                outputLog.error !== undefined
-                    ? _prepareErrorMessage(outputLog, language, command)
-                    : outputLog.result.stdout
-            if (outputLog.error) {
-                response.error = 1
-            }
+          compileLog.error !== undefined
+            ? _prepareErrorMessage(compileLog, language, compileCommand)
+            : "";
+      } else {
+        response.compileMessage = "";
+      }
+  
+      if (response.compileMessage === "") {
+        let command;
+        if (language === "java" || language === "bash") {
+          command = `cd /tmp/ && timeout ${langConfig.timeout}s ${langConfig.run}`;
         } else {
-            response.error = 1
+          command = `cd /tmp/ && ulimit -v ${langConfig.memory} && ulimit -m ${langConfig.memory} && timeout ${langConfig.timeout}s ${langConfig.run}`;
         }
+  
+        if (stdin) {
+          await fs.promises.writeFile("/tmp/input.txt", stdin);
+         
+          command += " < input.txt";
+        }
+  
+        const outputLog = await _runScript(command, res, true);
+        response.output =
+          outputLog.error !== undefined
+            ? _prepareErrorMessage(outputLog, language, command)
+            : outputLog.result.stdout;
+        if (outputLog.error) {
+          response.error = 1;
+        }
+      } else {
+        response.error = 1;
+      }
     } catch (e) {
-        logger.error(e)
-        throw new Error('Unable to execute code.')
+      logger.error(e);
+      throw new Error("Unable to execute code.");
     }
-}
+  };
 
 // This function expects an array of size greater than 0
 const _calculateScoreConfidence = (evaluations) => {
