@@ -14,4 +14,5 @@ module.exports = {
     RUST: "rust",
     C_SHARP: "csharp",
     DART: "dart",
+    PHP:'php',
   };

@@ -6,6 +6,7 @@ export const LANGUAGE_VERSIONS = {
     rust:"3.0.3",
     c:"10.3.0",
     cpp:"10.3.0",
+    php:"8.0.15",
     
   };
   

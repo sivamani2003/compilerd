@@ -4,14 +4,8 @@ ENV PYTHONUNBUFFERED=1
 
 # Install required dependencies and tools
 RUN set -ex && \
-    apk add --no-cache gcc g++ musl-dev python3 openjdk17 ruby iptables ip6tables bash lsof chromium rust cargo libc6-compat
+    apk add --no-cache gcc g++ musl-dev python3 openjdk17 ruby iptables ip6tables bash lsof chromium rust cargo libc6-compat curl php php-cli php-json php-phar php-openssl php-curl php-zip php-dom
 
-# Install .NET SDK and runtime
-RUN wget -O dotnet-install.sh https://dot.net/v1/dotnet-install.sh && \
-    chmod +x dotnet-install.sh && \
-    ./dotnet-install.sh -c Current --install-dir /usr/share/dotnet
-
-ENV PATH="$PATH:/usr/share/dotnet"
 
 RUN set -ex && \
     rm -f /usr/libexec/gcc/x86_64-alpine-linux-musl/6.4.0/cc1obj && \
@@ -20,13 +14,6 @@ RUN set -ex && \
     rm -f /usr/bin/x86_64-alpine-linux-musl-gcj
 
 RUN ln -sf python3 /usr/bin/python
-
-# Install Dart SDK
-RUN wget https://storage.googleapis.com/dart-archive/channels/stable/release/latest/sdk/dartsdk-linux-x64-release.zip && \
-    unzip dartsdk-linux-x64-release.zip -d /usr/lib/dart && \
-    rm dartsdk-linux-x64-release.zip
-
-ENV PATH="/usr/lib/dart/dart-sdk/bin:$PATH"
 
 ADD . /usr/bin/
 ADD start.sh /usr/bin/

@@ -1,4 +1,20 @@
-const {CPP,C,PYTHON,JAVA,NODEJS,RUBY,PROMPTV1,PROMPTV2,BASH,SWIFT,RUST,C_SHARP,DART,} = require("../enums/supportedLanguages");
+const {
+    CPP,
+    C,
+    PYTHON,
+    JAVA,
+    NODEJS,
+    RUBY,
+    PROMPTV1,
+    PROMPTV2,
+    BASH,
+    SWIFT,
+    RUST,
+    C_SHARP,
+    DART,
+    KOTLIN,
+    PHP, // Add PHP to your imports if necessary
+  } = require("../enums/supportedLanguages");
   
   const ONE_MB = 1024; // ulimit uses Kilobyte as base unit
   const ALLOWED_RAM = process.env.ALLOWED_RAM || 512;
@@ -37,7 +53,7 @@ const {CPP,C,PYTHON,JAVA,NODEJS,RUBY,PROMPTV1,PROMPTV2,BASH,SWIFT,RUST,C_SHARP,D
       run: "node solution.js",
       timeout: 10,
       filename: "solution.js",
-      memory: 786432, 
+      memory: 786432, // Node.js v20 requires more initial memory
     },
     [RUBY]: {
       compile: "ruby -c solution.rb",
@@ -79,6 +95,13 @@ const {CPP,C,PYTHON,JAVA,NODEJS,RUBY,PROMPTV1,PROMPTV2,BASH,SWIFT,RUST,C_SHARP,D
       run: "dart /tmp/solution.dart",
       timeout: 10,
       filename: "solution.dart",
+      memory: ALLOWED_RAM * ONE_MB,
+    },
+    [PHP]: {
+      compile: "",
+      run: "php solution.php",
+      timeout: 5,
+      filename: "solution.php",
       memory: ALLOWED_RAM * ONE_MB,
     },
     [PROMPTV1]: {
