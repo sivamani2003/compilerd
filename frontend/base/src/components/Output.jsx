@@ -4,7 +4,7 @@ import { executeCode } from "../api";
 
 const Output = ({ editorRef, language }) => {
   const toast = useToast();
-  const [output, setOutput] = useState(null);
+  const [output, setOutput] = useState(""); // Store output as a string
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
@@ -13,11 +13,22 @@ const Output = ({ editorRef, language }) => {
     if (!sourceCode) return;
     try {
       setIsLoading(true);
-      const { run: result } = await executeCode(language, sourceCode);
-      setOutput(result.output.split("\n"));
-      result.stderr ? setIsError(true) : setIsError(false);
+      const result = await executeCode(language, sourceCode);
+      if (result.status_code === 200) {
+        setOutput(result.output.trim()); // Trim whitespace from output
+        setIsError(false);
+      } else {
+        setIsError(true);
+        toast({
+          title: "Execution Error",
+          description: result.errorMessage || "Failed to run code",
+          status: "error",
+          duration: 6000,
+        });
+      }
     } catch (error) {
-      console.log(error);
+      console.error("Error executing code:", error);
+      setIsError(true);
       toast({
         title: "An error occurred.",
         description: error.message || "Unable to run code",
@@ -51,9 +62,7 @@ const Output = ({ editorRef, language }) => {
         borderRadius={4}
         borderColor={isError ? "red.500" : "#333"}
       >
-        {output
-          ? output.map((line, i) => <Text key={i}>{line}</Text>)
-          : 'Click "Run Code" to see the output here'}
+        <Text>{output || 'Click "Run Code" to see the output here'}</Text>
       </Box>
     </Box>
   );

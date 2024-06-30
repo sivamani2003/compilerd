@@ -7,19 +7,17 @@ import Output from "./Output";
 
 const CodeEditor = () => {
   const editorRef = useRef();
-  const [value, setValue] = useState("");
-  const [language, setLanguage] = useState("javascript");
+  const [value, setValue] = useState(CODE_SNIPPETS["nodejs"]); // Initialize with nodejs script
+  const [language, setLanguage] = useState("nodejs"); // Initialize with nodejs language
 
   const onMount = (editor) => {
-    console.log(editor)
     editorRef.current = editor;
     editor.focus();
-   
   };
 
-  const onSelect = (language) => {
-    setLanguage(language);
-    setValue(CODE_SNIPPETS[language]);
+  const onSelect = (lang) => {
+    setLanguage(lang);
+    setValue(CODE_SNIPPETS[lang]);
   };
 
   return (
