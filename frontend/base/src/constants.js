@@ -3,7 +3,7 @@ export const LANGUAGE_VERSIONS = {
     java: "15.0.2",
     nodejs:"16.13.0",
     bash:"5.1.8",
-    ruby:"3.0.3",
+    rust:"3.0.3",
     c:"10.3.0",
     cpp:"10.3.0",
     
